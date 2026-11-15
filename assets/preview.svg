@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+<title id="title">GTA VI Progress Tracker interface preview</title>
+<desc id="desc">Dark-themed tracker dashboard with overall progress and four categories: Story Missions, Side Jobs, Collectibles, and Vehicles.</desc>
+<rect width="1200" height="900" fill="#0f1115"/>
+<text x="64" y="88" fill="#f2f4f8" font-family="Arial,sans-serif" font-size="46" font-weight="700">GTA VI Progress Tracker</text>
+<text x="64" y="132" fill="#9aa3b2" font-family="Arial,sans-serif" font-size="22">Track missions, activities, collectibles and vehicles in one place.</text>
+<rect x="64" y="172" width="1072" height="132" rx="20" fill="#181b22" stroke="#2a2f3a" stroke-width="2"/>
+<text x="96" y="224" fill="#f2f4f8" font-family="Arial,sans-serif" font-size="28" font-weight="700">Whole game</text>
+<text x="96" y="264" fill="#9aa3b2" font-family="Arial,sans-serif" font-size="20">0 of 0 done</text>
+<text x="1068" y="230" text-anchor="end" fill="#ffd166" font-family="Arial,sans-serif" font-size="34" font-weight="700">0%</text>
+<rect x="96" y="278" width="1008" height="10" rx="5" fill="#2a2f3a"/>
+<g font-family="Arial,sans-serif">
+<rect x="64" y="332" width="520" height="238" rx="20" fill="#181b22" stroke="#2a2f3a" stroke-width="2"/>
+<text x="96" y="382" fill="#f2f4f8" font-size="27" font-weight="700">Story Missions</text><text x="96" y="416" fill="#9aa3b2" font-size="19">Main campaign missions</text><text x="536" y="384" text-anchor="end" fill="#ffd166" font-size="28" font-weight="700">0%</text>
+<rect x="96" y="442" width="456" height="10" rx="5" fill="#2a2f3a"/>
+<rect x="96" y="476" width="456" height="56" rx="12" fill="#0f1115" stroke="#2a2f3a" stroke-width="2"/><text x="118" y="512" fill="#9aa3b2" font-size="19">Add an item…</text><rect x="456" y="484" width="82" height="40" rx="9" fill="#ff6b35"/><text x="497" y="511" text-anchor="middle" fill="#111" font-size="18" font-weight="700">Add</text>
+<rect x="616" y="332" width="520" height="238" rx="20" fill="#181b22" stroke="#2a2f3a" stroke-width="2"/>
+<text x="648" y="382" fill="#f2f4f8" font-size="27" font-weight="700">Side Jobs</text><text x="648" y="416" fill="#9aa3b2" font-size="19">Side missions and activities</text><text x="1088" y="384" text-anchor="end" fill="#ffd166" font-size="28" font-weight="700">0%</text>
+<rect x="648" y="442" width="456" height="10" rx="5" fill="#2a2f3a"/>
+<rect x="648" y="476" width="456" height="56" rx="12" fill="#0f1115" stroke="#2a2f3a" stroke-width="2"/><text x="670" y="512" fill="#9aa3b2" font-size="19">Add an item…</text><rect x="1008" y="484" width="82" height="40" rx="9" fill="#ff6b35"/><text x="1049" y="511" text-anchor="middle" fill="#111" font-size="18" font-weight="700">Add</text>
+<rect x="64" y="598" width="520" height="238" rx="20" fill="#181b22" stroke="#2a2f3a" stroke-width="2"/>
+<text x="96" y="648" fill="#f2f4f8" font-size="27" font-weight="700">Collectibles</text><text x="96" y="682" fill="#9aa3b2" font-size="19">Hidden items, packages and finds</text><text x="536" y="650" text-anchor="end" fill="#ffd166" font-size="28" font-weight="700">0%</text>
+<rect x="96" y="708" width="456" height="10" rx="5" fill="#2a2f3a"/><rect x="96" y="742" width="456" height="56" rx="12" fill="#0f1115" stroke="#2a2f3a" stroke-width="2"/><text x="118" y="778" fill="#9aa3b2" font-size="19">Add an item…</text><rect x="456" y="750" width="82" height="40" rx="9" fill="#ff6b35"/><text x="497" y="777" text-anchor="middle" fill="#111" font-size="18" font-weight="700">Add</text>
+<rect x="616" y="598" width="520" height="238" rx="20" fill="#181b22" stroke="#2a2f3a" stroke-width="2"/>
+<text x="648" y="648" fill="#f2f4f8" font-size="27" font-weight="700">Vehicles</text><text x="648" y="682" fill="#9aa3b2" font-size="19">Cars, bikes, boats and planes</text><text x="1088" y="650" text-anchor="end" fill="#ffd166" font-size="28" font-weight="700">0%</text>
+<rect x="648" y="708" width="456" height="10" rx="5" fill="#2a2f3a"/><rect x="648" y="742" width="456" height="56" rx="12" fill="#0f1115" stroke="#2a2f3a" stroke-width="2"/><text x="670" y="778" fill="#9aa3b2" font-size="19">Add an item…</text><rect x="1008" y="750" width="82" height="40" rx="9" fill="#ff6b35"/><text x="1049" y="777" text-anchor="middle" fill="#111" font-size="18" font-weight="700">Add</text>
+</g></svg>

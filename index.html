@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GTA VI Progress Tracker</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0f1115;
+    --panel: #181b22;
+    --field: #0f1115;
+    --line: #2a2f3a;
+    --text: #f2f4f8;
+    --muted: #9aa3b2;
+    --accent: #ff6b35;
+    --accent-2: #ffd166;
+    --done: #3ddc97;
+    --notice-bg: #3a2a12;
+    --notice-text: #ffd9a0;
+  }
+  [hidden] { display: none !important; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+    line-height: 1.4;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 16px 16px 56px; }
+  h1 { font-size: 1.6rem; margin: 16px 0 4px; }
+  h2 { font-size: 1.15rem; margin: 0; }
+  .sub { color: var(--muted); font-size: .95rem; margin: 0 0 4px; }
+  .hint { color: var(--muted); font-size: .85rem; margin-top: 2px; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 44px; padding: 0 18px; border: 0; border-radius: 10px;
+    background: var(--accent); color: #111; font: inherit; font-weight: 700;
+    text-decoration: none; cursor: pointer; white-space: nowrap;
+  }
+  .btn.block { width: 100%; }
+  .btn.ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); font-weight: 500; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 14px; padding: 16px; margin-top: 16px;
+  }
+  .head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .pct {
+    font-weight: 700; font-size: 1.1rem; color: var(--accent-2);
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .bar {
+    height: 12px; background: var(--line); border-radius: 999px;
+    overflow: hidden; margin: 12px 0 6px;
+  }
+  .fill {
+    height: 100%; width: 0;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    transition: width .3s ease;
+  }
+  .count { color: var(--muted); font-size: .85rem; }
+  .add-form { display: flex; gap: 8px; margin: 14px 0 4px; }
+  .add-form input,
+  textarea {
+    font: inherit; font-size: 16px; color: var(--text); background: var(--field);
+    border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px;
+  }
+  .add-form input { flex: 1; min-width: 0; min-height: 44px; }
+  textarea { width: 100%; resize: vertical; margin-top: 8px; }
+  .items { list-style: none; padding: 0; margin: 8px 0 0; }
+  .item { padding: 6px 0; border-top: 1px solid var(--line); }
+  .item-top { display: flex; align-items: center; gap: 8px; }
+  .row {
+    display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;
+    min-height: 44px; cursor: pointer;
+  }
+  .row input { width: 24px; height: 24px; flex-shrink: 0; accent-color: var(--done); margin: 0; }
+  .label-text { font-size: 16px; word-break: break-word; }
+  .item.done .label-text { text-decoration: line-through; color: var(--muted); }
+  .del {
+    background: none; border: 0; color: var(--muted); font-size: 18px;
+    min-width: 44px; min-height: 44px; cursor: pointer;
+  }
+  .toggle {
+    min-height: 36px; padding: 0 12px; border-radius: 999px;
+    border: 1px solid var(--done); background: transparent; color: var(--done);
+    font: inherit; font-size: .85rem; font-weight: 600; cursor: pointer; white-space: nowrap;
+  }
+  .toggle.on { background: var(--done); color: #0b0f0c; }
+  .empty { color: var(--muted); font-size: .95rem; padding: 12px 0; }
+  .notice {
+    background: var(--notice-bg); color: var(--notice-text);
+    border-radius: 12px; padding: 12px 14px; margin-top: 16px; font-size: .92rem;
+  }
+  footer { margin-top: 24px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>GTA VI Progress Tracker</h1>
+    <p class="sub">Add an item, tap "Mark complete" when you finish it, and leave a note if you want. Progress saves in this browser.</p>
+  </header>
+
+  <div class="notice" id="notice" hidden></div>
+
+  <section class="panel" aria-label="Whole game progress">
+    <div class="head">
+      <div>
+        <h2>Whole game</h2>
+        <div class="count" id="overall-count">0 of 0 done</div>
+      </div>
+      <span class="pct" id="overall-pct">0%</span>
+    </div>
+    <div class="bar"><div class="fill" id="overall-fill"></div></div>
+  </section>
+
+  <div id="sections"></div>
+
+  <footer>
+    <button type="button" class="btn ghost" id="reset">Reset all progress</button>
+  </footer>
+</div>
+
+<script>
+(() => {
+  const STORAGE_KEY = 'gta6-progress-v1';
+  const SECTIONS = [
+    { key: 'story', title: 'Story Missions', hint: 'Main campaign missions' },
+    { key: 'side', title: 'Side Jobs', hint: 'Side missions and activities' },
+    { key: 'collectibles', title: 'Collectibles', hint: 'Hidden items, packages, finds' },
+    { key: 'vehicles', title: 'Vehicles', hint: 'Cars, bikes, boats, planes' }
+  ];
+
+  const $ = id => document.getElementById(id);
+  const noticeEl = $('notice');
+  const overallFill = $('overall-fill');
+  const overallPct = $('overall-pct');
+  const overallCount = $('overall-count');
+  const container = $('sections');
+  const panels = {};
+
+  const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  const emptyState = () => Object.fromEntries(SECTIONS.map(s => [s.key, []]));
+
+  function storageWorks() {
+    try {
+      localStorage.setItem('__gta6_test__', '1');
+      localStorage.removeItem('__gta6_test__');
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  let storageOK = storageWorks();
+
+  function showNotice() {
+    noticeEl.textContent = 'Your browser is blocking saved storage, so progress will only last until you close or reload this page. Everything else still works.';
+    noticeEl.hidden = false;
+  }
+
+  function sanitize(data) {
+    const out = emptyState();
+    SECTIONS.forEach(({ key }) => {
+      const list = data && Array.isArray(data[key]) ? data[key] : [];
+      out[key] = list
+        .filter(it => it && typeof it.text === 'string' && it.text.trim())
+        .map(it => ({
+          id: typeof it.id === 'string' ? it.id : newId(),
+          text: it.text.slice(0, 200),
+          done: it.done === true,
+          note: typeof it.note === 'string' ? it.note.slice(0, 1000) : ''
+        }));
+    });
+    return out;
+  }
+
+  function load() {
+    if (!storageOK) return emptyState();
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? sanitize(JSON.parse(raw)) : emptyState();
+    } catch (e) {
+      return emptyState();
+    }
+  }
+
+  let state = load();
+
+  function save() {
+    if (!storageOK) return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {
+      storageOK = false;
+      showNotice();
+    }
+  }
+
+  // Build the section panels (static markup only; user text is inserted via textContent)
+  SECTIONS.forEach(sec => {
+    const panel = document.createElement('section');
+    panel.className = 'panel';
+    panel.innerHTML = `
+      <div class="head">
+        <div>
+          <h2>${sec.title}</h2>
+          <div class="hint">${sec.hint}</div>
+        </div>
+        <span class="pct">0%</span>
+      </div>
+      <div class="bar"><div class="fill"></div></div>
+      <div class="count">0 of 0 done</div>
+      <form class="add-form" autocomplete="off">
+        <input type="text" maxlength="200" placeholder="Add an item…" aria-label="Add to ${sec.title}">
+        <button type="submit" class="btn">Add</button>
+      </form>
+      <ul class="items"></ul>`;
+    container.appendChild(panel);
+
+    panels[sec.key] = {
+      pct: panel.querySelector('.pct'),
+      fill: panel.querySelector('.fill'),
+      count: panel.querySelector('.count'),
+      list: panel.querySelector('.items')
+    };
+
+    panel.querySelector('form').addEventListener('submit', e => {
+      e.preventDefault();
+      const input = e.currentTarget.querySelector('input');
+      const text = input.value.trim();
+      if (!text) return;
+      state[sec.key].push({ id: newId(), text: text.slice(0, 200), done: false, note: '' });
+      input.value = '';
+      save();
+      renderList(sec.key);
+      updateProgress();
+    });
+  });
+
+  function buildItem(key, item) {
+    const li = document.createElement('li');
+    li.className = 'item' + (item.done ? ' done' : '');
+
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = item.done;
+
+    const label = document.createElement('label');
+    label.className = 'row';
+    const text = document.createElement('span');
+    text.className = 'label-text';
+    text.textContent = item.text;
+    label.append(cb, text);
+
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'toggle' + (item.done ? ' on' : '');
+    toggle.textContent = item.done ? 'Completed ✓' : 'Mark complete';
+
+    const del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'del';
+    del.setAttribute('aria-label', 'Delete item');
+    del.textContent = '✕';
+
+    const top = document.createElement('div');
+    top.className = 'item-top';
+    top.append(label, toggle, del);
+
+    const note = document.createElement('textarea');
+    note.rows = 2;
+    note.maxLength = 1000;
+    note.placeholder = 'Notes (optional)';
+    note.setAttribute('aria-label', 'Notes for ' + item.text);
+    note.value = item.note;
+
+    li.append(top, note);
+
+    const setDone = value => {
+      item.done = value;
+      cb.checked = value;
+      li.classList.toggle('done', value);
+      toggle.classList.toggle('on', value);
+      toggle.textContent = value ? 'Completed ✓' : 'Mark complete';
+      save();
+      updateProgress();
+    };
+
+    cb.addEventListener('change', () => setDone(cb.checked));
+    toggle.addEventListener('click', () => setDone(!item.done));
+
+    note.addEventListener('input', () => {
+      item.note = note.value;
+      save();
+    });
+
+    del.addEventListener('click', () => {
+      if (!confirm(`Delete "${item.text}"?`)) return;
+      state[key] = state[key].filter(i => i !== item);
+      save();
+      renderList(key);
+      updateProgress();
+    });
+
+    return li;
+  }
+
+  function renderList(key) {
+    const list = panels[key].list;
+    list.textContent = '';
+    if (!state[key].length) {
+      const empty = document.createElement('li');
+      empty.className = 'empty';
+      empty.textContent = 'Nothing here yet. Add the first one above.';
+      list.appendChild(empty);
+      return;
+    }
+    const frag = document.createDocumentFragment();
+    state[key].forEach(item => frag.appendChild(buildItem(key, item)));
+    list.appendChild(frag);
+  }
+
+  function updateProgress() {
+    let allDone = 0;
+    let allTotal = 0;
+    SECTIONS.forEach(({ key }) => {
+      const items = state[key];
+      const done = items.filter(i => i.done).length;
+      const total = items.length;
+      const pct = total ? Math.round((done / total) * 100) : 0;
+      const p = panels[key];
+      p.fill.style.width = pct + '%';
+      p.pct.textContent = pct + '%';
+      p.count.textContent = `${done} of ${total} done`;
+      allDone += done;
+      allTotal += total;
+    });
+    const pct = allTotal ? Math.round((allDone / allTotal) * 100) : 0;
+    overallFill.style.width = pct + '%';
+    overallPct.textContent = pct + '%';
+    overallCount.textContent = `${allDone} of ${allTotal} done`;
+  }
+
+  function renderAll() {
+    SECTIONS.forEach(({ key }) => renderList(key));
+    updateProgress();
+  }
+
+  $('reset').addEventListener('click', () => {
+    if (!confirm('Erase every item, tick and note on this page?')) return;
+    state = emptyState();
+    save();
+    renderAll();
+  });
+
+  if (!storageOK) showNotice();
+  renderAll();
+})();
+</script>
+</body>
+</html>
